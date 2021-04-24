@@ -1,9 +1,12 @@
+let isAddTaskBtnDisabled = true;
 let taskInput = document.getElementById('input-task');
 let addTaskBtn = document.getElementById('add-task-btn');
 let tasksList = document.getElementsByClassName('list-group')[0];
+let tasks = [];
 
-let tasks = [
-]
+let toggleDisableAddTaskBtn = () => {
+    addTaskBtn.toggleAttribute('disabled', isAddTaskBtnDisabled);
+}
 
 let createTaskListItem = (task) => {
 
@@ -33,15 +36,6 @@ let clearChildren = (parent) => {
     }
 }
 
-addTaskBtn.addEventListener('click', (event) => {
-    tasks.push({
-        name: taskInput.value
-    });
-    clearChildren(tasksList);
-    updateTasksView();
-    taskInput.value = '';
-});
-
 let updateTasksView = () => {
     tasks.forEach(task => {
         createTaskListItem(task.name);
@@ -51,5 +45,23 @@ let updateTasksView = () => {
 let init = () => {
     updateTasksView(tasks);
 }
+
+addTaskBtn.addEventListener('click', (event) => {
+    tasks.push({
+        name: taskInput.value
+    });
+    clearChildren(tasksList);
+    updateTasksView();
+    taskInput.value = '';
+    isAddTaskBtnDisabled = true;
+    toggleDisableAddTaskBtn();
+});
+
+taskInput.addEventListener('input', (event) => {
+    console.log('event');
+    isAddTaskBtnDisabled = event.target.value.length === 0;
+    toggleDisableAddTaskBtn();
+});
+
 
 init();
