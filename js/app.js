@@ -37,7 +37,7 @@ let createTaskListItem = (task) => {
     let inputTaskText = document.createElement('input');
     inputTaskText.classList.add('form-control');
     inputTaskText.setAttribute('type', 'text');
-    inputTaskText.toggleAttribute('disabled');
+    inputTaskText.toggleAttribute('readonly');
     inputTaskText.name = task.id;
     inputTaskText.value = task.name;
 
@@ -47,17 +47,10 @@ let createTaskListItem = (task) => {
     deleteBtn.setAttribute('name', task.id);
     deleteBtn.innerText = 'X'
 
-    // let label = document.createElement('label');
-    // label.classList.add('form-check-label');
-    // label.innerText = task.name;
     divInputGroupText.appendChild(inputCheckbox);
     divInputGroupPrepend.appendChild(divInputGroupText);
     divInputGroupAppend.appendChild(deleteBtn);
 
-
-
-    // div.appendChild(input);
-    // div.appendChild(label);
     li.appendChild(divInputGroup);
     divInputGroup.append(divInputGroupPrepend);
     divInputGroup.append(inputTaskText);
@@ -65,23 +58,6 @@ let createTaskListItem = (task) => {
         divInputGroup.append(divInputGroupAppend);
     }
     tasksList.appendChild(li);
-    // let div = document.createElement('div');
-    // div.classList.add('form-group', 'form-check', 'mb-0');
-
-    // let input = document.createElement('input');
-    // input.classList.add('form-check-input');
-    // input.setAttribute('type', 'checkbox');
-    // input.setAttribute('name', task.id);
-    // input.checked = task.completed;
-
-    // let label = document.createElement('label');
-    // label.classList.add('form-check-label');
-    // label.innerText = task.name;
-
-    // div.appendChild(input);
-    // div.appendChild(label);
-    // li.appendChild(div);
-    // tasksList.appendChild(li);
 }
 
 let clearChildren = (parent) => {
@@ -109,18 +85,35 @@ let setEventListenerToTasks = () => {
     let taskButtons = document.querySelectorAll('ul > li > div.input-group > div.input-group-append > button');
     taskButtons.forEach(taskbBtn => {
         taskbBtn.addEventListener('click', (event) => {
-            updateTasks(event, true);
+            updateTasks(event, 'delete');
+        });
+    });
+
+    let taskItemsInput = document.querySelectorAll('ul > li > div.input-group > input');
+    taskItemsInput.forEach(taskItem => {
+        taskItem.addEventListener('dblclick', (event) => {
+            event.target.toggleAttribute('readonly');
+        });
+        taskItem.addEventListener('blur', (event) => {
+            updateTasks(event);
         });
     });
 }
 
-let updateTasks = (taskEvent, deleteTask = false) => {
+let updateTasks = (taskEvent, action = '') => {
     let taskIndexFound = tasks.findIndex(elTask => elTask.id === taskEvent.target.name)
     let taskFound = tasks.find(elTask => elTask.id === taskEvent.target.name);
-    if (deleteTask) {
+    if (action === 'delete') {
         tasks.splice(taskIndexFound, 1);
     } else {
-        taskFound.completed = taskEvent.target.checked;
+        if (taskEvent.target.type === 'checkbox') {
+            taskFound.completed = taskEvent.target.checked;
+        }
+
+        if (taskEvent.target.type === 'text') {
+            taskFound.name = taskEvent.target.value;
+        }
+
         tasks.splice(
             taskIndexFound, 
             1, 
@@ -143,9 +136,9 @@ addTaskBtn.addEventListener('click', (event) => {
         completed: false
     });
     clearChildren(tasksList);
-    updateTasksView();
     taskInput.value = '';
     isAddTaskBtnDisabled = true;
+    updateTasksView();
     toggleDisableAddTaskBtn();
 });
 
