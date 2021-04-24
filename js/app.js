@@ -2,6 +2,7 @@ let isAddTaskBtnDisabled = true;
 let taskInput = document.getElementById('input-task');
 let addTaskBtn = document.getElementById('add-task-btn');
 let tasksList = document.getElementsByClassName('list-group')[0];
+let progressbar = document.getElementsByClassName('progress-bar')[0];
 let tasks = [];
 
 let getRandomId = () => {
@@ -66,20 +67,22 @@ let clearChildren = (parent) => {
     }
 }
 
-let updateTasksView = () => {
-    tasks.forEach(task => {
-        createTaskListItem(task);
-    });
+let updateProgressbar = () => {
+    let completedTasks = tasks.filter(elTask => elTask.completed);
+    let percentage = (completedTasks.length * 100) / tasks.length
+    progressbar.style.width = isNaN(percentage) ? '0%' : `${percentage}%`;
+}
 
+let updateTasksView = () => {
+    tasks.forEach(createTaskListItem);
     setEventListenerToTasks();
+    updateProgressbar();
 }
 
 let setEventListenerToTasks = () => {
     let taskCheckboxes = document.querySelectorAll('input[type="checkbox"]');
     taskCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', (event) => {
-            updateTasks(event);
-        });
+        checkbox.addEventListener('change', updateTasks);
     });
 
     let taskButtons = document.querySelectorAll('ul > li > div.input-group > div.input-group-append > button');
@@ -94,9 +97,7 @@ let setEventListenerToTasks = () => {
         taskItem.addEventListener('dblclick', (event) => {
             event.target.toggleAttribute('readonly');
         });
-        taskItem.addEventListener('blur', (event) => {
-            updateTasks(event);
-        });
+        taskItem.addEventListener('blur', updateTasks);
     });
 }
 
@@ -126,10 +127,10 @@ let updateTasks = (taskEvent, action = '') => {
 
 
 let init = () => {
-    updateTasksView(tasks);
+    updateTasksView();
 }
 
-addTaskBtn.addEventListener('click', (event) => {
+addTaskBtn.addEventListener('click', () => {
     tasks.push({
         id: 'task'+ getRandomId(),
         name: taskInput.value,
