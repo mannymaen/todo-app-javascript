@@ -1,8 +1,17 @@
 let isAddTaskBtnDisabled = true;
+let body = document.getElementsByTagName('BODY')[0];
 let taskInput = document.getElementById('input-task');
 let addTaskBtn = document.getElementById('add-task-btn');
 let tasksList = document.getElementsByClassName('list-group')[0];
 let progressbar = document.getElementsByClassName('progress-bar')[0];
+let iconInfo = document.getElementsByClassName('fa-info-circle')[0];
+let modal = document.getElementById('instructionModal');
+let closeModalBtn = document.getElementsByClassName('close')[0];
+closeModalBtn.addEventListener('click', () => {
+    body.classList.remove('modal-open');
+    modal.classList.remove('show', 'd-block');
+    modal.classList.add('d-none');
+});
 let tasks = [];
 
 let getRandomId = () => {
@@ -42,11 +51,14 @@ let createTaskListItem = (task) => {
     inputTaskText.name = task.id;
     inputTaskText.value = task.name;
 
+    let trashIcon = document.createElement('i')
+    trashIcon.classList.add('far', 'fa-trash-alt');
+
     let deleteBtn = document.createElement('button');
     deleteBtn.classList.add('btn', 'btn-danger');
     deleteBtn.setAttribute('type', 'button');
     deleteBtn.setAttribute('name', task.id);
-    deleteBtn.innerText = 'X'
+    deleteBtn.appendChild(trashIcon);
 
     divInputGroupText.appendChild(inputCheckbox);
     divInputGroupPrepend.appendChild(divInputGroupText);
@@ -147,6 +159,15 @@ taskInput.addEventListener('input', (event) => {
     isAddTaskBtnDisabled = event.target.value.length === 0;
     toggleDisableAddTaskBtn();
 });
+
+iconInfo.addEventListener('click', () => {
+    console.log('abrir modal');
+    body.classList.add('modal-open');
+    modal.classList.add('d-block');
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 100);
+})
 
 
 init();
